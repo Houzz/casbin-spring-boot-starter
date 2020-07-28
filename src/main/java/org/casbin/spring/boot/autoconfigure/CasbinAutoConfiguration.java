@@ -77,11 +77,13 @@ public class CasbinAutoConfiguration {
         String databaseName = getDatabaseName(jdbcTemplate.getDataSource());
         CasbinDataSourceInitializationMode initializeSchema = properties.getInitializeSchema();
         boolean autoCreateTable = initializeSchema == CasbinDataSourceInitializationMode.CREATE;
+        String tableName = properties.getTableName();
+
         switch (databaseName) {
             case "mysql":
             case "h2":
             case "postgresql":
-                return new JdbcAdapter(jdbcTemplate, exceptionProperties, autoCreateTable);
+                return new JdbcAdapter(jdbcTemplate, exceptionProperties, autoCreateTable, tableName);
             case "oracle":
                 return new OracleAdapter(jdbcTemplate, exceptionProperties, autoCreateTable);
             case "db2":

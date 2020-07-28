@@ -29,27 +29,14 @@ import java.util.stream.Collectors;
 @Slf4j
 public class JdbcAdapter implements Adapter {
 
-    private final static String INIT_TABLE_SQL = "CREATE TABLE IF NOT EXISTS casbin_rule (" +
-            "    ptype varchar(255) NOT NULL," +
-            "    v0    varchar(255) DEFAULT NULL," +
-            "    v1    varchar(255) DEFAULT NULL," +
-            "    v2    varchar(255) DEFAULT NULL," +
-            "    v3    varchar(255) DEFAULT NULL," +
-            "    v4    varchar(255) DEFAULT NULL," +
-            "    v5    varchar(255) DEFAULT NULL" +
-            ")";
-    private final static String DROP_TABLE_SQL = "DROP TABLE IF EXISTS casbin_rule";
-    private final static String DELETE_TABLE_CONTENT_SQL = "DELETE FROM casbin_rule";
-    private final static String LOAD_POLICY_SQL = "SELECT * FROM casbin_rule";
-    private final static String INSERT_POLICY_SQL = "INSERT INTO casbin_rule VALUES(?, ?, ?, ?, ?, ?, ?)";
-    private final static String DELETE_POLICY_SQL = "DELETE FROM casbin_rule WHERE ptype = ? ";
-
     protected JdbcTemplate jdbcTemplate;
     protected CasbinExceptionProperties casbinExceptionProperties;
+    protected String tableName;
 
-    public JdbcAdapter(JdbcTemplate jdbcTemplate, CasbinExceptionProperties casbinExceptionProperties, boolean autoCreateTable) {
+    public JdbcAdapter(JdbcTemplate jdbcTemplate, CasbinExceptionProperties casbinExceptionProperties, boolean autoCreateTable, String tableName) {
         this.jdbcTemplate = jdbcTemplate;
         this.casbinExceptionProperties = casbinExceptionProperties;
+        this.tableName = tableName;
         if (autoCreateTable) {
             initTable();
         }
@@ -57,19 +44,35 @@ public class JdbcAdapter implements Adapter {
 
 
     protected String getInitTableSql() {
-        return INIT_TABLE_SQL;
+        return "CREATE TABLE IF NOT EXISTS " + tableName + " (" +
+                "    ptype varchar(255) NOT NULL," +
+                "    v0    varchar(255) DEFAULT NULL," +
+                "    v1    varchar(255) DEFAULT NULL," +
+                "    v2    varchar(255) DEFAULT NULL," +
+                "    v3    varchar(255) DEFAULT NULL," +
+                "    v4    varchar(255) DEFAULT NULL," +
+                "    v5    varchar(255) DEFAULT NULL" +
+                ")";
     }
 
     protected String getDropTableSql() {
-        return DROP_TABLE_SQL;
-    }
-
-    protected String getLoadPolicySql() {
-        return LOAD_POLICY_SQL;
+        return "DROP TABLE IF EXISTS " + tableName;
     }
 
     protected String getDeleteTableContentSql() {
-        return DELETE_TABLE_CONTENT_SQL;
+        return "DELETE FROM " + tableName;
+    }
+
+    protected String getLoadPolicySql() {
+        return "SELECT * FROM " + tableName;
+    }
+
+    protected String getInsertPolicySql() {
+        return "INSERT INTO " + tableName + " VALUES(?, ?, ?, ?, ?, ?, ?)";
+    }
+
+    protected String getDeletePolicySql() {
+        return "DELETE FROM " + tableName + " WHERE ptype = ? ";
     }
 
     /**
@@ -134,7 +137,7 @@ public class JdbcAdapter implements Adapter {
         deleteTableContent();
         List<CasbinRule> casbinRules = CasbinRule.transformToCasbinRule(model);
         int[] rows = jdbcTemplate.batchUpdate(
-                INSERT_POLICY_SQL,
+                getInsertPolicySql(),
                 new BatchPreparedStatementSetter() {
 
                     @Override
@@ -179,7 +182,7 @@ public class JdbcAdapter implements Adapter {
         for (int i = 0; i < 6 - rule.size(); i++) {
             rules.add(null);
         }
-        int rows = jdbcTemplate.update(INSERT_POLICY_SQL, rules.toArray());
+        int rows = jdbcTemplate.update(getInsertPolicySql(), rules.toArray());
         if (rows != 1) {
             throw new CasbinAdapterException(String.format("Add policy error, add %d rows, expect %d rows", rows, 1));
         }
@@ -213,7 +216,7 @@ public class JdbcAdapter implements Adapter {
         if (fieldValues.length == 0) return;
         List<String> params = new ArrayList<>(Arrays.asList(fieldValues));
         params.add(0, ptype);
-        String delSql = DELETE_POLICY_SQL;
+        String delSql = getDeletePolicySql();
         int columnIndex = fieldIndex;
         for (int i = 0; i < fieldValues.length; i++) {
             delSql = String.format("%s%s%s%s", delSql, " AND v", columnIndex, " = ? ");
