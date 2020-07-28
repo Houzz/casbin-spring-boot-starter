@@ -25,8 +25,8 @@ public class OracleAdapter extends JdbcAdapter {
     private final static String DROP_TABLE_SQL = "DROP TABLE CASBIN_RULE";
     private final static String CHECK_TABLE_EXIST = "SELECT COUNT(*) FROM USER_TABLES WHERE TABLE_NAME = UPPER('CASBIN_RULE')";
 
-    public OracleAdapter(JdbcTemplate jdbcTemplate, CasbinExceptionProperties casbinExceptionProperties, boolean autoCreateTable) {
-        super(jdbcTemplate, casbinExceptionProperties, autoCreateTable);
+    public OracleAdapter(JdbcTemplate jdbcTemplate, CasbinExceptionProperties casbinExceptionProperties, boolean autoCreateTable, String tableName) {
+        super(jdbcTemplate, casbinExceptionProperties, autoCreateTable, tableName);
     }
 
     @Override

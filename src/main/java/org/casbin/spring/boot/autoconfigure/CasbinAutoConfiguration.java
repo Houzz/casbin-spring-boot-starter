@@ -85,9 +85,9 @@ public class CasbinAutoConfiguration {
             case "postgresql":
                 return new JdbcAdapter(jdbcTemplate, exceptionProperties, autoCreateTable, tableName);
             case "oracle":
-                return new OracleAdapter(jdbcTemplate, exceptionProperties, autoCreateTable);
+                return new OracleAdapter(jdbcTemplate, exceptionProperties, autoCreateTable, tableName);
             case "db2":
-                return new DB2Adapter(jdbcTemplate, exceptionProperties, autoCreateTable);
+                return new DB2Adapter(jdbcTemplate, exceptionProperties, autoCreateTable, tableName);
             default:
                 throw new CasbinAdapterException("Can't find " + databaseName + " jdbc adapter");
         }

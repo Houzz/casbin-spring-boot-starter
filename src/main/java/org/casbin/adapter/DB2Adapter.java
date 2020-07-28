@@ -29,8 +29,8 @@ public class DB2Adapter extends JdbcAdapter {
      * @param jdbcTemplate
      * @param autoCreateTable
      */
-    public DB2Adapter(JdbcTemplate jdbcTemplate, CasbinExceptionProperties casbinExceptionProperties, boolean autoCreateTable) {
-        super(jdbcTemplate, casbinExceptionProperties, autoCreateTable);
+    public DB2Adapter(JdbcTemplate jdbcTemplate, CasbinExceptionProperties casbinExceptionProperties, boolean autoCreateTable, String tableName) {
+        super(jdbcTemplate, casbinExceptionProperties, autoCreateTable, tableName);
     }
 
     @Override
