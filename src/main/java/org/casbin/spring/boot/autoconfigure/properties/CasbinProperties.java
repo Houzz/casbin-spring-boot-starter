@@ -19,26 +19,34 @@ import java.io.InputStream;
 @Data
 @ConfigurationProperties("casbin")
 public class CasbinProperties {
+
     /**
      * 启用Casbin
      */
     private boolean enableCasbin = true;
+
     /**
      * 是否使用同步的Enforcer
      */
     private boolean useSyncedEnforcer = false;
+
     /**
      * 本地model文件
      */
     private String model = "classpath:casbin/model.conf";
+
     /**
      * 本地policy文件
      */
     private String policy = "classpath:casbin/policy.csv";
+
     /**
      * 存储策略
      */
     private CasbinStoreType storeType = CasbinStoreType.JDBC;
+
+    private String tableName = "casbin_rule";
+
     /**
      * Watcher同步策略
      */
