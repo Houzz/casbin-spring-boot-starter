@@ -52,4 +52,8 @@ public class RedisWatcher implements Watcher {
         updateCallback.run();
         logger.info("Casbin policy updated.");
     }
+
+    public String getWatcherTopic() {
+        return watcherTopic;
+    }
 }
