@@ -21,52 +21,63 @@ import java.io.InputStream;
 public class CasbinProperties {
 
     /**
-     * 启用Casbin
+     * enable Casbin or not
      */
     private boolean enableCasbin = true;
 
     /**
-     * 是否使用同步的Enforcer
+     * whether use synced Enforcer
      */
     private boolean useSyncedEnforcer = false;
 
     /**
-     * 本地model文件
+     * local model file
      */
     private String model = "classpath:casbin/model.conf";
 
     /**
-     * 本地policy文件
+     * local policy file
      */
     private String policy = "classpath:casbin/policy.csv";
 
     /**
-     * 存储策略
+     * policy persistence strategy
      */
     private CasbinStoreType storeType = CasbinStoreType.JDBC;
 
+    /**
+     * table name for persisting policies
+     */
     private String tableName = "casbin_rule";
 
     /**
-     * Watcher同步策略
+     * Watcher sync strategy
      */
     private CasbinWatcherType watcherType = CasbinWatcherType.REDIS;
+
     /**
-     * 数据表初始化策略
+     * Watcher topic name
+     */
+    private String watcherTopic = "CASBIN_POLICY_TOPIC";
+
+    /**
+     * whether auto create table if not exists
      */
     private CasbinDataSourceInitializationMode initializeSchema = CasbinDataSourceInitializationMode.CREATE;
+
     /**
-     * 是否使用Watcher进行策略同步
+     * enable watcher or not
      */
     private boolean enableWatcher = false;
+
     /**
-     * 仅在适配器支持该功能时配置才会生效
-     * 可通过enforcer.enableAutoSave(true)手动切换
+     * only valid when adapter supports auto save
+     * can turn on with enforcer.enableAutoSave(true) as well
      */
     private boolean autoSave = true;
+
     /**
-     * 如果未设置本地model文件地址或默认路径未找到文件
-     * 使用默认rbac配置
+     * whether use default RBAC configs if model cannot be loaded
      */
     private boolean useDefaultModelIfModelNotSetting = true;
 
