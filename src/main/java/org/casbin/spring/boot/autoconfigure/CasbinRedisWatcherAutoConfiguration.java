@@ -36,14 +36,13 @@ import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 @ConditionalOnExpression("'jdbc'.equalsIgnoreCase('${casbin.storeType:jdbc}') && ${casbin.enableWatcher:false} && 'redis'.equalsIgnoreCase('${casbin.watcherType:redis}') ")
 public class CasbinRedisWatcherAutoConfiguration {
 
-    public final static String CASBIN_POLICY_TOPIC = "CASBIN_POLICY_TOPIC";
-
     @Bean
     @ConditionalOnBean(RedisTemplate.class)
     @ConditionalOnMissingBean
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-    public Watcher redisWatcher(StringRedisTemplate stringRedisTemplate, Enforcer enforcer) {
-        RedisWatcher watcher = new RedisWatcher(stringRedisTemplate);
+    public Watcher redisWatcher(StringRedisTemplate stringRedisTemplate, Enforcer enforcer, CasbinProperties properties) {
+        String watcherTopic = properties.getWatcherTopic();
+        RedisWatcher watcher = new RedisWatcher(stringRedisTemplate, watcherTopic);
         enforcer.setWatcher(watcher);
         logger.info("Casbin set watcher: {}", watcher.getClass().getName());
         return watcher;
@@ -68,12 +67,15 @@ public class CasbinRedisWatcherAutoConfiguration {
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     public RedisMessageListenerContainer redisMessageListenerContainer(
             RedisConnectionFactory connectionFactory,
-            MessageListenerAdapter listenerAdapter
+            MessageListenerAdapter listenerAdapter,
+            CasbinProperties properties
     ) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
-        //订阅CASBIN_POLICY_TOPIC通道
-        container.addMessageListener(listenerAdapter, new ChannelTopic(CASBIN_POLICY_TOPIC));
+
+        // subscribe watcher channel
+        String watcherTopic = properties.getWatcherTopic();
+        container.addMessageListener(listenerAdapter, new ChannelTopic(watcherTopic));
         return container;
     }
 }

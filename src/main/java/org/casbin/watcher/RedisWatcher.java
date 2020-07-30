@@ -18,11 +18,13 @@ import java.util.UUID;
 @Slf4j
 public class RedisWatcher implements Watcher {
     private Runnable updateCallback;
-    private StringRedisTemplate stringRedisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
+    private final String watcherTopic;
     private final static String REDIS_WATCHER_UUID = UUID.randomUUID().toString();
 
-    public RedisWatcher(StringRedisTemplate stringRedisTemplate) {
+    public RedisWatcher(StringRedisTemplate stringRedisTemplate, String watcherTopic) {
         this.stringRedisTemplate = stringRedisTemplate;
+        this.watcherTopic = watcherTopic;
         logger.info("Current casbin redis watcher uuid: {}", REDIS_WATCHER_UUID);
     }
 
@@ -34,7 +36,7 @@ public class RedisWatcher implements Watcher {
     @Override
     public void update() {
         stringRedisTemplate.convertAndSend(
-                CasbinRedisWatcherAutoConfiguration.CASBIN_POLICY_TOPIC,
+                watcherTopic,
                 "Casbin policy has a new version from redis watcher: " + REDIS_WATCHER_UUID
         );
     }
